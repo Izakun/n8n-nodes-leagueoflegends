@@ -16,23 +16,23 @@ import {
  * e.g. euw1.api.riotgames.com
  */
 const PLATFORMS = [
-	{ name: 'EUW — Europe West (euw1)', value: 'euw1' },
-	{ name: 'EUNE — Europe Nordic & East (eun1)', value: 'eun1' },
-	{ name: 'North America (na1)', value: 'na1' },
-	{ name: 'Korea (kr)', value: 'kr' },
-	{ name: 'Brazil (br1)', value: 'br1' },
-	{ name: 'Japan (jp1)', value: 'jp1' },
-	{ name: 'LAN — Latin America North (la1)', value: 'la1' },
-	{ name: 'LAS — Latin America South (la2)', value: 'la2' },
-	{ name: 'Oceania (oc1)', value: 'oc1' },
-	{ name: 'Turkey (tr1)', value: 'tr1' },
-	{ name: 'Russia (ru)', value: 'ru' },
-	{ name: 'Middle East (me1)', value: 'me1' },
-	{ name: 'Philippines (ph2)', value: 'ph2' },
-	{ name: 'Singapore (sg2)', value: 'sg2' },
-	{ name: 'Thailand (th2)', value: 'th2' },
-	{ name: 'Taiwan (tw2)', value: 'tw2' },
-	{ name: 'Vietnam (vn2)', value: 'vn2' },
+	{ name: 'Europe West', value: 'euw1' },
+	{ name: 'Europe Nordic & East', value: 'eun1' },
+	{ name: 'North America', value: 'na1' },
+	{ name: 'Korea', value: 'kr' },
+	{ name: 'Brazil', value: 'br1' },
+	{ name: 'Japan', value: 'jp1' },
+	{ name: 'Latin America North', value: 'la1' },
+	{ name: 'Latin America South', value: 'la2' },
+	{ name: 'Oceania', value: 'oc1' },
+	{ name: 'Turkey', value: 'tr1' },
+	{ name: 'Russia', value: 'ru' },
+	{ name: 'Middle East', value: 'me1' },
+	{ name: 'Philippines', value: 'ph2' },
+	{ name: 'Singapore', value: 'sg2' },
+	{ name: 'Thailand', value: 'th2' },
+	{ name: 'Taiwan', value: 'tw2' },
+	{ name: 'Vietnam', value: 'vn2' },
 ];
 
 /**
@@ -113,11 +113,11 @@ export class LeagueOfLegends implements INodeType {
 				noDataExpression: true,
 				options: [
 					{ name: 'Account', value: 'account' },
-					{ name: 'Summoner', value: 'summoner' },
-					{ name: 'Spectator (Current Game)', value: 'spectator' },
-					{ name: 'Match', value: 'match' },
-					{ name: 'League (Ranked)', value: 'league' },
 					{ name: 'Champion Mastery', value: 'championMastery' },
+					{ name: 'League (Ranked)', value: 'league' },
+					{ name: 'Match', value: 'match' },
+					{ name: 'Spectator (Current Game)', value: 'spectator' },
+					{ name: 'Summoner', value: 'summoner' },
 				],
 				default: 'account',
 			},
@@ -135,7 +135,7 @@ export class LeagueOfLegends implements INodeType {
 					{
 						name: 'Get by Riot ID',
 						value: 'getByRiotId',
-						action: 'Get an account by Riot ID (gameName#tagLine)',
+						action: 'Get an account by Riot ID',
 					},
 					{
 						name: 'Get by PUUID',
@@ -207,7 +207,7 @@ export class LeagueOfLegends implements INodeType {
 					{
 						name: 'Get Timeline',
 						value: 'getTimeline',
-						action: 'Get the timeline (events per minute) of a match',
+						action: 'Get the timeline of a match',
 					},
 				],
 				default: 'getMany',
@@ -226,7 +226,7 @@ export class LeagueOfLegends implements INodeType {
 					{
 						name: 'Get Ranked Entries',
 						value: 'getEntries',
-						action: 'Get the ranked entries (tier, LP, wins/losses) of a player',
+						action: 'Get the ranked entries of a player',
 					},
 				],
 				default: 'getEntries',
@@ -243,7 +243,7 @@ export class LeagueOfLegends implements INodeType {
 				displayOptions: { show: { resource: ['championMastery'] } },
 				options: [
 					{
-						name: 'Get All',
+						name: 'Get Many',
 						value: 'getAll',
 						action: 'Get champion mastery for every champion of a player',
 					},
@@ -316,7 +316,7 @@ export class LeagueOfLegends implements INodeType {
 				name: 'returnAll',
 				type: 'boolean',
 				default: false,
-				description: 'Whether to return all match IDs or only up to a given limit',
+				description: 'Whether to return all results or only up to a given limit',
 				displayOptions: { show: { resource: ['match'], operation: ['getMany'] } },
 			},
 			{
@@ -324,8 +324,8 @@ export class LeagueOfLegends implements INodeType {
 				name: 'limit',
 				type: 'number',
 				typeOptions: { minValue: 1 },
-				default: 20,
-				description: 'Max number of match IDs to return',
+				default: 50,
+				description: 'Max number of results to return',
 				displayOptions: {
 					show: { resource: ['match'], operation: ['getMany'], returnAll: [false] },
 				},
@@ -360,14 +360,14 @@ export class LeagueOfLegends implements INodeType {
 						description: 'Filter by match type. Cannot be combined with Queue ID.',
 					},
 					{
-						displayName: 'Start Time (epoch seconds)',
+						displayName: 'Start Time (Epoch Seconds)',
 						name: 'startTime',
 						type: 'number',
 						default: 0,
 						description: 'Only matches started after this UNIX timestamp (in seconds)',
 					},
 					{
-						displayName: 'End Time (epoch seconds)',
+						displayName: 'End Time (Epoch Seconds)',
 						name: 'endTime',
 						type: 'number',
 						default: 0,
