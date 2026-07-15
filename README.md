@@ -1,10 +1,21 @@
+<img src="nodes/LeagueOfLegends/logo.png" width="90" align="right" alt="League of Legends" />
+
 # n8n-nodes-leagueoflegends
 
-Community node for n8n to interact with the **Riot Games / League of Legends API**.
+Community node for n8n to interact with the **Riot Games / League of Legends API** —
+current game, match history, ranked stats, champion mastery and more.
+
+## Preview
+
+A single **League of Legends** node exposing 10 actions grouped by resource:
+
+<p align="center">
+  <img src="docs/node-preview.png" width="380" alt="League of Legends node actions in n8n" />
+</p>
 
 ## What it does
 
-A single **League of Legends** node with the following resources & operations:
+The node exposes the following resources & operations:
 
 | Resource | Operation | Riot endpoint |
 |---|---|---|
@@ -38,6 +49,14 @@ hits `lol/status/v4/platform-data` on EUW.
 3. **League → Get Ranked Entries** (`puuid`) → tier / LP / wins / losses
 4. **Match → Get Many** (`puuid`, filter queue `420`) → recent match IDs
 5. **Match → Get** (loop over each `matchId`) → full stats per game
+
+```mermaid
+flowchart LR
+    A["Account<br/>Get by Riot ID"] -->|puuid| B["Spectator<br/>Get Current Game"]
+    A -->|puuid| C["League<br/>Ranked Entries"]
+    A -->|puuid| D["Match<br/>Get Many"]
+    D -->|matchId| E["Match<br/>Get details"]
+```
 
 ## Build
 

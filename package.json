@@ -12,6 +12,14 @@
   ],
   "license": "MIT",
   "author": "Alan Carrer <alan.carrer@syd.fr>",
+  "homepage": "https://github.com/Izakun/n8n-nodes-leagueoflegends",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Izakun/n8n-nodes-leagueoflegends.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Izakun/n8n-nodes-leagueoflegends/issues"
+  },
   "main": "index.js",
   "engines": {
     "node": ">=18.10"
