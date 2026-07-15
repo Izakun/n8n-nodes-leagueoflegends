@@ -78,6 +78,7 @@ export class LeagueOfLegends implements INodeType {
 		version: 1,
 		subtitle: '={{$parameter["operation"] + " : " + $parameter["resource"]}}',
 		description: 'Interact with the Riot Games / League of Legends API',
+		usableAsTool: true,
 		defaults: {
 			name: 'League of Legends',
 		},
