@@ -1,4 +1,4 @@
-<img src="nodes/LeagueOfLegends/logo.png" width="90" align="right" alt="League of Legends" />
+<img src="nodes/LeagueOfLegends/logo.svg" width="90" align="right" alt="League of Legends" />
 
 # n8n-nodes-leagueoflegends
 

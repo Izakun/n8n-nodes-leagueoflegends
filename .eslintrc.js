@@ -36,8 +36,6 @@ module.exports = {
 			plugins: ['eslint-plugin-n8n-nodes-base'],
 			extends: ['plugin:n8n-nodes-base/nodes'],
 			rules: {
-				// We intentionally ship a PNG icon (the League of Legends logo), not an SVG.
-				'n8n-nodes-base/node-class-description-icon-not-svg': 'off',
 				// Keep domain acronyms readable in action subtitles (Riot ID, PUUID, LP, IDs);
 				// the strict sentence-case autofix mangles them ("IDs" -> "i ds").
 				'n8n-nodes-base/node-param-operation-option-action-miscased': 'off',

@@ -73,7 +73,7 @@ export class LeagueOfLegends implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'League of Legends',
 		name: 'leagueOfLegends',
-		icon: 'file:logo.png',
+		icon: 'file:logo.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + " : " + $parameter["resource"]}}',
