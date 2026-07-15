@@ -1,0 +1,47 @@
+{
+  "name": "n8n-nodes-leagueoflegends",
+  "version": "0.1.0",
+  "description": "n8n community node to interact with the Riot Games / League of Legends API (current game, match history, ranked stats, mastery...)",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "league-of-legends",
+    "riot-games",
+    "lol",
+    "riot"
+  ],
+  "license": "MIT",
+  "author": "Alan Carrer <alan.carrer@syd.fr>",
+  "main": "index.js",
+  "engines": {
+    "node": ">=18.10"
+  },
+  "scripts": {
+    "build": "tsc && gulp build:icons",
+    "dev": "tsc --watch",
+    "format": "prettier nodes credentials --write",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/RiotGamesApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/LeagueOfLegends/LeagueOfLegends.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "gulp": "^5.0.0",
+    "n8n-workflow": "*",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
+}
