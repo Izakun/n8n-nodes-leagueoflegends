@@ -12,7 +12,8 @@
   ],
   "license": "MIT",
   "author": {
-    "name": "Izakun"
+    "name": "Izakun",
+    "email": "carrer.a@outlook.fr"
   },
   "homepage": "https://github.com/Izakun/n8n-nodes-leagueoflegends",
   "repository": {
