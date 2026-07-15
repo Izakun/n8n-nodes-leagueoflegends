@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-leagueoflegends",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "n8n community node to interact with the Riot Games / League of Legends API (current game, match history, ranked stats, mastery...)",
   "keywords": [
     "n8n-community-node-package",
