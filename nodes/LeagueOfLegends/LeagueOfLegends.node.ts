@@ -416,37 +416,19 @@ export class LeagueOfLegends implements INodeType {
 				const resource = this.getNodeParameter('resource', i) as string;
 				const operation = this.getNodeParameter('operation', i) as string;
 
-				let response: unknown;
+				const param = <T>(name: string, fallback?: T) =>
+					this.getNodeParameter(name, i, fallback as T) as T;
 
-				if (resource === 'account') {
-					if (operation === 'getByRiotId') {
-						const gameName = encodeURIComponent(this.getNodeParameter('gameName', i) as string);
-						const tagLine = encodeURIComponent(this.getNodeParameter('tagLine', i) as string);
-						response = await request(
-							accountContinent(platform),
-							`/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`,
-						);
-					} else {
-						const puuid = this.getNodeParameter('puuid', i) as string;
-						response = await request(
-							accountContinent(platform),
-							`/riot/account/v1/accounts/by-puuid/${puuid}`,
-						);
-					}
-				} else if (resource === 'summoner') {
-					const puuid = this.getNodeParameter('puuid', i) as string;
-					response = await request(platform, `/lol/summoner/v4/summoners/by-puuid/${puuid}`);
-				} else if (resource === 'spectator') {
-					const puuid = this.getNodeParameter('puuid', i) as string;
+				// Sentinel returned by a handler to emit nothing for this item.
+				const SKIP = Symbol('skip');
+
+				const getCurrentGame = async (): Promise<unknown> => {
+					const puuid = param<string>('puuid');
 					try {
-						response = await request(
-							platform,
-							`/lol/spectator/v5/active-games/by-summoner/${puuid}`,
-						);
+						return await request(platform, `/lol/spectator/v5/active-games/by-summoner/${puuid}`);
 					} catch (error) {
 						// Riot returns 404 when the player is simply not in a game right now.
-						// That is an expected "no data" case, not a failure: emit nothing and
-						// move on instead of throwing (avoids a failed execution every poll).
+						// That is an expected "no data" case, not a failure: emit nothing.
 						const e = error as {
 							httpCode?: unknown;
 							statusCode?: unknown;
@@ -457,90 +439,112 @@ export class LeagueOfLegends implements INodeType {
 							e.httpCode ?? e.statusCode ?? e.response?.statusCode ?? e.response?.status ?? '',
 						);
 						if (status === '404' || (e.message ?? '').includes('404')) {
-							continue;
+							return SKIP;
 						}
 						throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
 					}
-				} else if (resource === 'league') {
-					const puuid = this.getNodeParameter('puuid', i) as string;
-					response = await request(platform, `/lol/league/v4/entries/by-puuid/${puuid}`);
-				} else if (resource === 'championMastery') {
-					const puuid = this.getNodeParameter('puuid', i) as string;
-					if (operation === 'getTop') {
-						const count = this.getNodeParameter('count', i) as number;
-						response = await request(
-							platform,
-							`/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top`,
-							{ count },
-						);
-					} else {
-						response = await request(
-							platform,
-							`/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}`,
-						);
-					}
-				} else if (resource === 'match') {
+				};
+
+				const getManyMatches = async (): Promise<unknown> => {
+					const puuid = param<string>('puuid');
+					const returnAll = param<boolean>('returnAll');
+					const filters = param<{
+						queue?: number;
+						type?: string;
+						startTime?: number;
+						endTime?: number;
+					}>('matchFilters', {});
+
+					const baseQs: Record<string, string | number> = {};
+					if (filters.queue) baseQs.queue = filters.queue;
+					if (filters.type) baseQs.type = filters.type;
+					if (filters.startTime) baseQs.startTime = filters.startTime;
+					if (filters.endTime) baseQs.endTime = filters.endTime;
+
+					const endpoint = `/lol/match/v5/matches/by-puuid/${puuid}/ids`;
 					const continent = matchContinent(platform);
-					if (operation === 'get') {
-						const matchId = this.getNodeParameter('matchId', i) as string;
-						response = await request(continent, `/lol/match/v5/matches/${matchId}`);
-					} else if (operation === 'getTimeline') {
-						const matchId = this.getNodeParameter('matchId', i) as string;
-						response = await request(continent, `/lol/match/v5/matches/${matchId}/timeline`);
-					} else {
-						// getMany — list of match IDs, with optional pagination
-						const puuid = this.getNodeParameter('puuid', i) as string;
-						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-						const filters = this.getNodeParameter('matchFilters', i, {}) as {
-							queue?: number;
-							type?: string;
-							startTime?: number;
-							endTime?: number;
-						};
+					let matchIds: string[] = [];
 
-						const baseQs: Record<string, string | number> = {};
-						if (filters.queue) baseQs.queue = filters.queue;
-						if (filters.type) baseQs.type = filters.type;
-						if (filters.startTime) baseQs.startTime = filters.startTime;
-						if (filters.endTime) baseQs.endTime = filters.endTime;
-
-						const endpoint = `/lol/match/v5/matches/by-puuid/${puuid}/ids`;
-						let matchIds: string[] = [];
-
-						if (returnAll) {
-							const pageSize = 100;
-							let start = 0;
-							// Riot caps count at 100 per call, so page until a short page.
-							// eslint-disable-next-line no-constant-condition
-							while (true) {
-								const page = (await request(continent, endpoint, {
-									...baseQs,
-									start,
-									count: pageSize,
-								})) as string[];
-								matchIds = matchIds.concat(page);
-								if (page.length < pageSize) break;
-								start += pageSize;
-							}
-						} else {
-							const limit = this.getNodeParameter('limit', i) as number;
-							matchIds = (await request(continent, endpoint, {
+					if (returnAll) {
+						const pageSize = 100;
+						let start = 0;
+						// Riot caps count at 100 per call, so page until a short page.
+						// eslint-disable-next-line no-constant-condition
+						while (true) {
+							const page = (await request(continent, endpoint, {
 								...baseQs,
-								start: 0,
-								count: Math.min(limit, 100),
+								start,
+								count: pageSize,
 							})) as string[];
-							matchIds = matchIds.slice(0, limit);
+							matchIds = matchIds.concat(page);
+							if (page.length < pageSize) break;
+							start += pageSize;
 						}
-
-						for (const matchId of matchIds) {
-							returnData.push({ json: { matchId }, pairedItem: { item: i } });
-						}
-						continue; // handled emission ourselves
+					} else {
+						const limit = param<number>('limit');
+						matchIds = (await request(continent, endpoint, {
+							...baseQs,
+							start: 0,
+							count: Math.min(limit, 100),
+						})) as string[];
+						matchIds = matchIds.slice(0, limit);
 					}
-				} else {
-					throw new NodeOperationError(this.getNode(), `Unknown resource: ${resource}`, {
-						itemIndex: i,
-					});
+
+					// Returned as an array so the normaliser emits one item per match ID.
+					return matchIds.map((matchId) => ({ matchId }));
+				};
+
+				const handlers: Record<string, () => Promise<unknown>> = {
+					'account:getByRiotId': () =>
+						request(
+							accountContinent(platform),
+							`/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
+								param<string>('gameName'),
+							)}/${encodeURIComponent(param<string>('tagLine'))}`,
+						),
+					'account:getByPuuid': () =>
+						request(
+							accountContinent(platform),
+							`/riot/account/v1/accounts/by-puuid/${param<string>('puuid')}`,
+						),
+					'summoner:getByPuuid': () =>
+						request(platform, `/lol/summoner/v4/summoners/by-puuid/${param<string>('puuid')}`),
+					'spectator:getCurrentGame': getCurrentGame,
+					'league:getEntries': () =>
+						request(platform, `/lol/league/v4/entries/by-puuid/${param<string>('puuid')}`),
+					'championMastery:getTop': () =>
+						request(
+							platform,
+							`/lol/champion-mastery/v4/champion-masteries/by-puuid/${param<string>('puuid')}/top`,
+							{ count: param<number>('count') },
+						),
+					'championMastery:getAll': () =>
+						request(
+							platform,
+							`/lol/champion-mastery/v4/champion-masteries/by-puuid/${param<string>('puuid')}`,
+						),
+					'match:get': () =>
+						request(matchContinent(platform), `/lol/match/v5/matches/${param<string>('matchId')}`),
+					'match:getTimeline': () =>
+						request(
+							matchContinent(platform),
+							`/lol/match/v5/matches/${param<string>('matchId')}/timeline`,
+						),
+					'match:getMany': getManyMatches,
+				};
+
+				const handler = handlers[`${resource}:${operation}`];
+				if (!handler) {
+					throw new NodeOperationError(
+						this.getNode(),
+						`Unsupported operation: ${resource} / ${operation}`,
+						{ itemIndex: i },
+					);
+				}
+
+				const response = await handler();
+				if (response === SKIP) {
+					continue;
 				}
 
 				// Normalise: arrays -> one item per element, objects -> single item.
