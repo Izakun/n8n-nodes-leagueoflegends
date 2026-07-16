@@ -36,9 +36,11 @@ module.exports = {
 			plugins: ['eslint-plugin-n8n-nodes-base'],
 			extends: ['plugin:n8n-nodes-base/nodes'],
 			rules: {
-				// Keep domain acronyms readable in action subtitles (Riot ID, PUUID, LP, IDs);
-				// the strict sentence-case autofix mangles them ("IDs" -> "i ds").
-				'n8n-nodes-base/node-param-operation-option-action-miscased': 'off',
+				// The pinned eslint-plugin-n8n-nodes-base (1.16.x) predates NodeConnectionTypes
+				// and wants string literals for inputs/outputs; current n8n tooling (and the
+				// verification reviewer) require NodeConnectionTypes.Main. Follow the current convention.
+				'n8n-nodes-base/node-class-description-inputs-wrong-regular-node': 'off',
+				'n8n-nodes-base/node-class-description-outputs-wrong': 'off',
 			},
 		},
 	],

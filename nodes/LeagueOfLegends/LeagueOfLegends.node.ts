@@ -8,6 +8,7 @@ import {
 	INodeTypeDescription,
 	JsonObject,
 	NodeApiError,
+	NodeConnectionTypes,
 	NodeOperationError,
 } from 'n8n-workflow';
 
@@ -73,7 +74,7 @@ export class LeagueOfLegends implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'League of Legends',
 		name: 'leagueOfLegends',
-		icon: 'file:logo.svg',
+		icon: { light: 'file:logo.svg', dark: 'file:logo.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + " : " + $parameter["resource"]}}',
@@ -82,8 +83,8 @@ export class LeagueOfLegends implements INodeType {
 		defaults: {
 			name: 'League of Legends',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'riotGamesApi',
@@ -136,7 +137,7 @@ export class LeagueOfLegends implements INodeType {
 					{
 						name: 'Get by Riot ID',
 						value: 'getByRiotId',
-						action: 'Get an account by Riot ID',
+						action: 'Get an account by game name and tag',
 					},
 					{
 						name: 'Get by PUUID',
@@ -198,7 +199,7 @@ export class LeagueOfLegends implements INodeType {
 					{
 						name: 'Get Many (History)',
 						value: 'getMany',
-						action: 'Get a list of match IDs for a player',
+						action: 'Get many matches for a player',
 					},
 					{
 						name: 'Get',
@@ -458,7 +459,7 @@ export class LeagueOfLegends implements INodeType {
 						if (status === '404' || (e.message ?? '').includes('404')) {
 							continue;
 						}
-						throw error;
+						throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
 					}
 				} else if (resource === 'league') {
 					const puuid = this.getNodeParameter('puuid', i) as string;
@@ -563,9 +564,6 @@ export class LeagueOfLegends implements INodeType {
 						pairedItem: { item: i },
 					});
 					continue;
-				}
-				if (error instanceof NodeApiError || error instanceof NodeOperationError) {
-					throw error;
 				}
 				throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
 			}

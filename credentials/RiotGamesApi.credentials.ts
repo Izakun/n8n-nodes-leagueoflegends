@@ -10,6 +10,8 @@ export class RiotGamesApi implements ICredentialType {
 
 	displayName = 'Riot Games API';
 
+	icon = 'file:riotGamesApi.svg' as const;
+
 	documentationUrl = 'https://developer.riotgames.com/';
 
 	properties: INodeProperties[] = [
