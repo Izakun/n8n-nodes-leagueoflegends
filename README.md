@@ -5,20 +5,27 @@
 [![npm version](https://img.shields.io/npm/v/n8n-nodes-leagueoflegends.svg)](https://www.npmjs.com/package/n8n-nodes-leagueoflegends)
 [![npm downloads](https://img.shields.io/npm/dm/n8n-nodes-leagueoflegends.svg)](https://www.npmjs.com/package/n8n-nodes-leagueoflegends)
 [![License: MIT](https://img.shields.io/npm/l/n8n-nodes-leagueoflegends.svg)](./LICENSE)
+[![n8n verified](https://img.shields.io/badge/n8n-verified%20community%20node-EA4B71)](https://docs.n8n.io/integrations/community-nodes/installation/verified-install/)
 
 Community node for n8n to interact with the **Riot Games / League of Legends API** —
 current game, match history, ranked stats, champion mastery and more.
 
+> ✅ **Verified community node** — available directly from the node panel on n8n
+> (self-hosted **and** n8n Cloud).
+
 ## Installation
 
-In your n8n instance, go to **Settings → Community Nodes → Install** and enter:
+This is a **verified** community node: in n8n, click **+ (Add node)**, search for
+**League of Legends**, and add it — no manual install needed.
 
-```
-n8n-nodes-leagueoflegends
-```
+<details>
+<summary>Manual install (older n8n, or as an unverified package)</summary>
+
+**Settings → Community Nodes → Install** → `n8n-nodes-leagueoflegends`. Manual / Docker
+deployment is also documented further down.
+</details>
 
 Then create a **Riot Games API** credential with your `RGAPI-...` key (see below).
-Manual / Docker deployment is also documented further down.
 
 ## Preview
 
