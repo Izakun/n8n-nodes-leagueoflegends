@@ -89,13 +89,13 @@ npm run build                  # tsc + copy icons into dist/
 
 ## Deploy to a self-hosted (Docker) n8n
 
-n8n auto-loads packages placed in `~/.n8n/custom/node_modules/`. On this NAS the n8n
-data dir is bind-mounted `host:/compose/n8n_data -> container:/home/node/.n8n`, so:
+n8n auto-loads packages placed in `~/.n8n/custom/node_modules/`. If your n8n
+data dir is bind-mounted from the host into the container, copy the built package into it:
 
 ```bash
 # from the project dir, after `npm run build`
-mkdir -p /compose/n8n_data/custom/node_modules
-cp -r . /compose/n8n_data/custom/node_modules/n8n-nodes-leagueoflegends
+mkdir -p /path/to/n8n-data/custom/node_modules
+cp -r . /path/to/n8n-data/custom/node_modules/n8n-nodes-leagueoflegends
 # then restart n8n so it re-scans custom nodes
 docker restart n8n
 ```
